@@ -36,6 +36,39 @@ This is the API spec for Microsoft HPC Pack 2016 Update 3.
 <a name="paths"></a>
 ## Paths
 
+<a name="getclusterversion"></a>
+### Get HPC Pack Version
+```
+GET /cluster/version
+```
+
+
+#### Description
+Get the version of Microsoft HPC Pack installed on the HPC cluster that hosts the web service.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|
+|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**200**|Return the installed HPC Pack version.|string|
+
+
+#### Example HTTP response
+
+##### Response 200
+```json
+"5.3.6420.0"
+```
+
+
 <a name="getclusteractiveheadnode"></a>
 ### Get Active Head Node Name
 ```
@@ -102,15 +135,99 @@ Get DateTime format for the DateTime objects returned in the API
 ```
 
 
-<a name="getclusterversion"></a>
-### Get HPC Pack Version
+<a name="getnodes"></a>
+### Get Node List
 ```
-GET /cluster/version
+GET /nodes
 ```
 
 
 #### Description
-Get the version of Microsoft HPC Pack installed on the HPC cluster that hosts the web service.
+Get the values of the specified properties for all of the nodes in an HPC cluster.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|Default|
+|---|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
+|**Query**|**$filter**  <br>*optional*|Filter result by specified filters. A filter is in the form of "{name}20eq%20{value}". Now the only available filter is NodeState.|string||
+|**Query**|**properties**  <br>*optional*|A comma-separated list of the names for the properties of the nodes for which you want to get values. If you do not specify the Properties parameter, the response contains values for all of the available properties of the nodes.|string||
+|**Query**|**queryId**  <br>*optional*|The value of the x-ms-continuation-queryId header from the previouse response of this operation, used for reading the next page of data.|string||
+|**Query**|**rowsPerRead**  <br>*optional*|Specifies how many rows of data to retrieve each time.|integer|`10`|
+|**Query**|**sortNodesBy**  <br>*optional*|A node property by which nodes will be sorted. If this parameter is not specified or a property with a specified name does not exist for a node, the result will be sorted by node Id.|string|`"Id"`|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**200**|Return a list of nodes.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the queryId query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the queryId URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
+
+
+#### Example HTTP response
+
+##### Response 200
+```json
+[ {
+  "Properties" : [ {
+    "Name" : "Id",
+    "Value" : "1"
+  }, {
+    "Name" : "Name",
+    "Value" : "WIN2016"
+  }, {
+    "Name" : "State",
+    "Value" : "Online"
+  }, {
+    "Name" : "Availability",
+    "Value" : "AlwaysOn"
+  }, {
+    "Name" : "Location",
+    "Value" : "OnPremise"
+  }, {
+    "Name" : "OnlineTime",
+    "Value" : "7/5/2019 9:05:07 AM"
+  } ]
+} ]
+```
+
+
+<a name="getnodebyname"></a>
+### Get Node by Name
+```
+GET /nodes/{name}
+```
+
+
+#### Description
+Get the values of all of the properties for the specified node.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|
+|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
+|**Path**|**name**  <br>*required*|Node name.|string|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**200**|Return all properties of the node.|< [RestProperty](#restproperty) > array|
+
+
+<a name="getnodegroups"></a>
+### Get Node Group List
+```
+GET /nodes/groups
+```
+
+
+#### Description
+Get the names and descriptions for all of the node groups for the HPC cluster.
 
 
 #### Parameters
@@ -124,26 +241,50 @@ Get the version of Microsoft HPC Pack installed on the HPC cluster that hosts th
 
 |HTTP Code|Description|Schema|
 |---|---|---|
-|**200**|Return the installed HPC Pack version.|string|
+|**200**|Return a list of node groups.|< [RestObject](#restobject) > array|
 
 
 #### Example HTTP response
 
 ##### Response 200
 ```json
-"5.3.6420.0"
+[ {
+  "Properties" : [ {
+    "Name" : "Name",
+    "Value" : "HeadNodes"
+  }, {
+    "Name" : "Description",
+    "Value" : "The head nodes in the cluster"
+  } ]
+}, {
+  "Properties" : [ {
+    "Name" : "Name",
+    "Value" : "ComputeNodes"
+  }, {
+    "Name" : "Description",
+    "Value" : "The compute nodes in the cluster"
+  } ]
+}, {
+  "Properties" : [ {
+    "Name" : "Name",
+    "Value" : "WCFBrokerNodes"
+  }, {
+    "Name" : "Description",
+    "Value" : "The broker nodes in the cluster"
+  } ]
+} ]
 ```
 
 
-<a name="createjob"></a>
-### Create Job
+<a name="getnodegroupmembers"></a>
+### Get Node Group Members
 ```
-POST /jobs
+GET /nodes/groups/{name}
 ```
 
 
 #### Description
-Creates a new job on the HPC cluster.
+Get the list of the nodes that belong to the specified node group.
 
 
 #### Parameters
@@ -151,21 +292,21 @@ Creates a new job on the HPC cluster.
 |Type|Name|Description|Schema|
 |---|---|---|---|
 |**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Body**|**properties**  <br>*optional*|Properties of job to create|< [RestProperty](#restproperty) > array|
+|**Path**|**name**  <br>*required*|Node group name.|string|
 
 
 #### Responses
 
 |HTTP Code|Description|Schema|
 |---|---|---|
-|**200**|The newly created job id is returned.|integer|
+|**200**|Return a name list of nodes which belong to the node group.|< string > array|
 
 
 #### Example HTTP response
 
 ##### Response 200
 ```json
-19
+[ "CN001", "CN002", "CN003" ]
 ```
 
 
@@ -230,6 +371,40 @@ Gets all/filtered jobs for the HPC cluster.
 ```
 
 
+<a name="createjob"></a>
+### Create Job
+```
+POST /jobs
+```
+
+
+#### Description
+Creates a new job on the HPC cluster.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|
+|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
+|**Body**|**properties**  <br>*optional*|Properties of job to create|< [RestProperty](#restproperty) > array|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**200**|The newly created job id is returned.|integer|
+
+
+#### Example HTTP response
+
+##### Response 200
+```json
+19
+```
+
+
 <a name="createjobfromxml"></a>
 ### Create Job From XML
 ```
@@ -261,39 +436,6 @@ Create a new job on the HPC cluster by using the information in the specified jo
 ##### Response 200
 ```json
 19
-```
-
-
-<a name="getjobtemplates"></a>
-### Get Job Templates
-```
-GET /jobs/templates
-```
-
-
-#### Description
-Get a list of the names of the job templates that are available on the HPC cluster.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|
-|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**200**|Return a list of template names.|< string > array|
-
-
-#### Example HTTP response
-
-##### Response 200
-```json
-[ "Default" ]
 ```
 
 
@@ -371,61 +513,6 @@ Set the values for the properties of the specified job.
 |**204**|OK|No Content|
 
 
-<a name="canceljob"></a>
-### Cancel Job
-```
-POST /jobs/{jobId}/cancel
-```
-
-
-#### Description
-Cancel the specified job.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|Default|
-|---|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
-|**Path**|**jobId**  <br>*required*|Job Id|integer||
-|**Query**|**forced**  <br>*optional*|Specifies whether to stop the job immediately without using the grace period for canceling the tasks in the job and without running the node release task, if the job contains one. True indicates that the job should stop immediately without using the grace period for canceling the tasks in the job and without running the node release task. False indicates that the job should not stop immediately and should use the grace period for canceling the tasks in the job and run the node release task.|boolean|`"false"`|
-|**Body**|**message**  <br>*optional*|A message for the operation.|string||
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**204**|OK|No Content|
-
-
-<a name="setjobcustomproperties"></a>
-### Set Job Custom Properties
-```
-POST /jobs/{jobId}/customProperties
-```
-
-
-#### Description
-Set the values of custom properties for a job.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|
-|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Path**|**jobId**  <br>*required*|Job Id|integer|
-|**Body**|**properties**  <br>*optional*|Custom properties for the job|< [RestProperty](#restproperty) > array|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**204**|OK|No Content|
-
-
 <a name="getjobcustomproperties"></a>
 ### Get Job Custom Properties
 ```
@@ -467,15 +554,15 @@ Get the values of the specified custom properties for the job, or the values of 
 ```
 
 
-<a name="setjobenvironmentvariables"></a>
-### Set Job Environment Variables
+<a name="setjobcustomproperties"></a>
+### Set Job Custom Properties
 ```
-POST /jobs/{jobId}/envVariables
+POST /jobs/{jobId}/customProperties
 ```
 
 
 #### Description
-Sets the values of environment variables for a job.
+Set the values of custom properties for a job.
 
 
 #### Parameters
@@ -484,7 +571,7 @@ Sets the values of environment variables for a job.
 |---|---|---|---|
 |**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
 |**Path**|**jobId**  <br>*required*|Job Id|integer|
-|**Body**|**properties**  <br>*optional*|Environment variables for the job|< [RestProperty](#restproperty) > array|
+|**Body**|**properties**  <br>*optional*|Custom properties for the job|< [RestProperty](#restproperty) > array|
 
 
 #### Responses
@@ -533,6 +620,88 @@ Get the values of the specified environment variables for the job, or the values
   "Value" : "v2"
 } ]
 ```
+
+
+<a name="setjobenvironmentvariables"></a>
+### Set Job Environment Variables
+```
+POST /jobs/{jobId}/envVariables
+```
+
+
+#### Description
+Sets the values of environment variables for a job.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|
+|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
+|**Path**|**jobId**  <br>*required*|Job Id|integer|
+|**Body**|**properties**  <br>*optional*|Environment variables for the job|< [RestProperty](#restproperty) > array|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**204**|OK|No Content|
+
+
+<a name="submitjob"></a>
+### Submit Job
+```
+POST /jobs/{jobId}/submit
+```
+
+
+#### Description
+Submit a job to the HPC Job Scheduler Service so that the HPC Job Scheduler Service can add the job to the queue of jobs to run. If the credentials for the account under which the job should run are not cached on the server, you can set them in the UserName and Password properties. A job that is submitted by this operation is not validated. After the job is submitted, you can get information about the job by using the Get Job operation.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|
+|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
+|**Path**|**jobId**  <br>*required*|Job Id|integer|
+|**Body**|**properties**  <br>*optional*|Properties of job to submit|< [RestProperty](#restproperty) > array|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**204**|OK|No Content|
+
+
+<a name="canceljob"></a>
+### Cancel Job
+```
+POST /jobs/{jobId}/cancel
+```
+
+
+#### Description
+Cancel the specified job.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|Default|
+|---|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
+|**Path**|**jobId**  <br>*required*|Job Id|integer||
+|**Query**|**forced**  <br>*optional*|Specifies whether to stop the job immediately without using the grace period for canceling the tasks in the job and without running the node release task, if the job contains one. True indicates that the job should stop immediately without using the grace period for canceling the tasks in the job and without running the node release task. False indicates that the job should not stop immediately and should use the grace period for canceling the tasks in the job and run the node release task.|boolean|`"false"`|
+|**Body**|**message**  <br>*optional*|A message for the operation.|string||
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**204**|OK|No Content|
 
 
 <a name="finishjob"></a>
@@ -586,68 +755,6 @@ Resubmit the specified job to the queue.
 |HTTP Code|Description|Schema|
 |---|---|---|
 |**204**|OK|No Content|
-
-
-<a name="submitjob"></a>
-### Submit Job
-```
-POST /jobs/{jobId}/submit
-```
-
-
-#### Description
-Submit a job to the HPC Job Scheduler Service so that the HPC Job Scheduler Service can add the job to the queue of jobs to run. If the credentials for the account under which the job should run are not cached on the server, you can set them in the UserName and Password properties. A job that is submitted by this operation is not validated. After the job is submitted, you can get information about the job by using the Get Job operation.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|
-|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Path**|**jobId**  <br>*required*|Job Id|integer|
-|**Body**|**properties**  <br>*optional*|Properties of job to submit|< [RestProperty](#restproperty) > array|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**204**|OK|No Content|
-
-
-<a name="addtask"></a>
-### Add Task
-```
-POST /jobs/{jobId}/tasks
-```
-
-
-#### Description
-Add a task to a job.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|
-|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Path**|**jobId**  <br>*required*|Job Id|integer|
-|**Body**|**properties**  <br>*optional*|Properties of task to add.|< [RestProperty](#restproperty) > array|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**200**|The newly created task id is returned.|integer|
-
-
-#### Example HTTP response
-
-##### Response 200
-```json
-1
-```
 
 
 <a name="gettasks"></a>
@@ -742,6 +849,41 @@ Get the values of the properties for all of the tasks in the specified job.
 ```
 
 
+<a name="addtask"></a>
+### Add Task
+```
+POST /jobs/{jobId}/tasks
+```
+
+
+#### Description
+Add a task to a job.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|
+|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
+|**Path**|**jobId**  <br>*required*|Job Id|integer|
+|**Body**|**properties**  <br>*optional*|Properties of task to add.|< [RestProperty](#restproperty) > array|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**200**|The newly created task id is returned.|integer|
+
+
+#### Example HTTP response
+
+##### Response 200
+```json
+1
+```
+
+
 <a name="gettask"></a>
 ### Get Task
 ```
@@ -821,63 +963,6 @@ Set the values of properties for a task in a job.
 |**204**|OK|No Content|
 
 
-<a name="canceltask"></a>
-### Cancel Task
-```
-POST /jobs/{jobId}/tasks/{taskId}/cancel
-```
-
-
-#### Description
-Cancel the specified task.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|Default|
-|---|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
-|**Path**|**jobId**  <br>*required*|Job Id|integer||
-|**Path**|**taskId**  <br>*required*|Task Id|integer||
-|**Query**|**forced**  <br>*optional*|Specifies whether to stop the task immediately without using the grace period for canceling a task. True indicates that the task should stop immediately without using the grace period for canceling a task. False indicates that the task should use the grace period for canceling a task.|boolean|`"false"`|
-|**Body**|**message**  <br>*optional*|A message for the operation.|string||
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**204**|OK|No Content|
-
-
-<a name="settaskcustomproperties"></a>
-### Set Task Custom Properties
-```
-POST /jobs/{jobId}/tasks/{taskId}/customProperties
-```
-
-
-#### Description
-Set the values of custom properties for a task.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|
-|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Path**|**jobId**  <br>*required*|Job Id|integer|
-|**Path**|**taskId**  <br>*required*|Task Id|integer|
-|**Body**|**properties**  <br>*optional*|Custom properties for the task|< [RestProperty](#restproperty) > array|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**204**|OK|No Content|
-
-
 <a name="gettaskcustomproperties"></a>
 ### Get Task Custom Properties
 ```
@@ -920,15 +1005,15 @@ Get the values of the specified custom properties for the task, or the values of
 ```
 
 
-<a name="settaskenvironmentvariables"></a>
-### Set Task Environment Variables
+<a name="settaskcustomproperties"></a>
+### Set Task Custom Properties
 ```
-POST /jobs/{jobId}/tasks/{taskId}/envVariables
+POST /jobs/{jobId}/tasks/{taskId}/customProperties
 ```
 
 
 #### Description
-Set the value of one or more environment variables for a task.
+Set the values of custom properties for a task.
 
 
 #### Parameters
@@ -938,7 +1023,7 @@ Set the value of one or more environment variables for a task.
 |**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
 |**Path**|**jobId**  <br>*required*|Job Id|integer|
 |**Path**|**taskId**  <br>*required*|Task Id|integer|
-|**Body**|**properties**  <br>*optional*|Environment variables for the task|< [RestProperty](#restproperty) > array|
+|**Body**|**properties**  <br>*optional*|Custom properties for the task|< [RestProperty](#restproperty) > array|
 
 
 #### Responses
@@ -988,6 +1073,63 @@ Get the values of the specified environment variables for the task, or the value
   "Value" : "v2"
 } ]
 ```
+
+
+<a name="settaskenvironmentvariables"></a>
+### Set Task Environment Variables
+```
+POST /jobs/{jobId}/tasks/{taskId}/envVariables
+```
+
+
+#### Description
+Set the value of one or more environment variables for a task.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|
+|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
+|**Path**|**jobId**  <br>*required*|Job Id|integer|
+|**Path**|**taskId**  <br>*required*|Task Id|integer|
+|**Body**|**properties**  <br>*optional*|Environment variables for the task|< [RestProperty](#restproperty) > array|
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**204**|OK|No Content|
+
+
+<a name="canceltask"></a>
+### Cancel Task
+```
+POST /jobs/{jobId}/tasks/{taskId}/cancel
+```
+
+
+#### Description
+Cancel the specified task.
+
+
+#### Parameters
+
+|Type|Name|Description|Schema|Default|
+|---|---|---|---|---|
+|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
+|**Path**|**jobId**  <br>*required*|Job Id|integer||
+|**Path**|**taskId**  <br>*required*|Task Id|integer||
+|**Query**|**forced**  <br>*optional*|Specifies whether to stop the task immediately without using the grace period for canceling a task. True indicates that the task should stop immediately without using the grace period for canceling a task. False indicates that the task should use the grace period for canceling a task.|boolean|`"false"`|
+|**Body**|**message**  <br>*optional*|A message for the operation.|string||
+
+
+#### Responses
+
+|HTTP Code|Description|Schema|
+|---|---|---|
+|**204**|OK|No Content|
 
 
 <a name="finishtask"></a>
@@ -1211,73 +1353,15 @@ Move a failed, canceled, or queued subtask to the configuring state so that the 
 |**204**|OK|No Content|
 
 
-<a name="getnodes"></a>
-### Get Node List
+<a name="getjobtemplates"></a>
+### Get Job Templates
 ```
-GET /nodes
-```
-
-
-#### Description
-Get the values of the specified properties for all of the nodes in an HPC cluster.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|Default|
-|---|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
-|**Query**|**$filter**  <br>*optional*|Filter result by specified filters. A filter is in the form of "{name}20eq%20{value}". Now the only available filter is NodeState.|string||
-|**Query**|**properties**  <br>*optional*|A comma-separated list of the names for the properties of the nodes for which you want to get values. If you do not specify the Properties parameter, the response contains values for all of the available properties of the nodes.|string||
-|**Query**|**queryId**  <br>*optional*|The value of the x-ms-continuation-queryId header from the previouse response of this operation, used for reading the next page of data.|string||
-|**Query**|**rowsPerRead**  <br>*optional*|Specifies how many rows of data to retrieve each time.|integer|`10`|
-|**Query**|**sortNodesBy**  <br>*optional*|A node property by which nodes will be sorted. If this parameter is not specified or a property with a specified name does not exist for a node, the result will be sorted by node Id.|string|`"Id"`|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**200**|Return a list of nodes.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the queryId query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the queryId URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
-
-
-#### Example HTTP response
-
-##### Response 200
-```json
-[ {
-  "Properties" : [ {
-    "Name" : "Id",
-    "Value" : "1"
-  }, {
-    "Name" : "Name",
-    "Value" : "WIN2016"
-  }, {
-    "Name" : "State",
-    "Value" : "Online"
-  }, {
-    "Name" : "Availability",
-    "Value" : "AlwaysOn"
-  }, {
-    "Name" : "Location",
-    "Value" : "OnPremise"
-  }, {
-    "Name" : "OnlineTime",
-    "Value" : "7/5/2019 9:05:07 AM"
-  } ]
-} ]
-```
-
-
-<a name="getnodegroups"></a>
-### Get Node Group List
-```
-GET /nodes/groups
+GET /jobs/templates
 ```
 
 
 #### Description
-Get the names and descriptions for all of the node groups for the HPC cluster.
+Get a list of the names of the job templates that are available on the HPC cluster.
 
 
 #### Parameters
@@ -1291,99 +1375,15 @@ Get the names and descriptions for all of the node groups for the HPC cluster.
 
 |HTTP Code|Description|Schema|
 |---|---|---|
-|**200**|Return a list of node groups.|< [RestObject](#restobject) > array|
+|**200**|Return a list of template names.|< string > array|
 
 
 #### Example HTTP response
 
 ##### Response 200
 ```json
-[ {
-  "Properties" : [ {
-    "Name" : "Name",
-    "Value" : "HeadNodes"
-  }, {
-    "Name" : "Description",
-    "Value" : "The head nodes in the cluster"
-  } ]
-}, {
-  "Properties" : [ {
-    "Name" : "Name",
-    "Value" : "ComputeNodes"
-  }, {
-    "Name" : "Description",
-    "Value" : "The compute nodes in the cluster"
-  } ]
-}, {
-  "Properties" : [ {
-    "Name" : "Name",
-    "Value" : "WCFBrokerNodes"
-  }, {
-    "Name" : "Description",
-    "Value" : "The broker nodes in the cluster"
-  } ]
-} ]
+[ "Default" ]
 ```
-
-
-<a name="getnodegroupmembers"></a>
-### Get Node Group Members
-```
-GET /nodes/groups/{name}
-```
-
-
-#### Description
-Get the list of the nodes that belong to the specified node group.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|
-|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Path**|**name**  <br>*required*|Node group name.|string|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**200**|Return a name list of nodes which belong to the node group.|< string > array|
-
-
-#### Example HTTP response
-
-##### Response 200
-```json
-[ "CN001", "CN002", "CN003" ]
-```
-
-
-<a name="getnodebyname"></a>
-### Get Node by Name
-```
-GET /nodes/{name}
-```
-
-
-#### Description
-Get the values of all of the properties for the specified node.
-
-
-#### Parameters
-
-|Type|Name|Description|Schema|
-|---|---|---|---|
-|**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Path**|**name**  <br>*required*|Node name.|string|
-
-
-#### Responses
-
-|HTTP Code|Description|Schema|
-|---|---|---|
-|**200**|Return all properties of the node.|< [RestProperty](#restproperty) > array|
 
 
 
