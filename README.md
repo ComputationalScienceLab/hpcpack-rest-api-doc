@@ -1,4 +1,3 @@
-
 * [HPC Pack REST API 2016](#hpc-pack-rest-api-2016)
    * [Overview](#overview)
       * [Version information](#version-information)
@@ -59,7 +58,7 @@ This is the API spec for Microsoft HPC Pack 2016 Update 3.
 
 
 ### Version information
-*Version* : 1.0.0
+*Version* : 2016-11-01.5.3
 
 
 ### Contact information
@@ -202,9 +201,9 @@ Get the values of the specified properties for all of the nodes in an HPC cluste
 |Type|Name|Description|Schema|Default|
 |---|---|---|---|---|
 |**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
-|**Query**|**$filter**  <br>*optional*|Filter result by specified filters. A filter is in the form of "{name}20eq%20{value}". Now the only available filter is NodeState.|string||
+|**Query**|**$filter**  <br>*optional*|Filter result by specified filters. A filter is in the form of "<name>20eq%20<value>". Now the only available filter is _NodeState_.|string||
 |**Query**|**properties**  <br>*optional*|A comma-separated list of the names for the properties of the nodes for which you want to get values. If you do not specify the Properties parameter, the response contains values for all of the available properties of the nodes.|string||
-|**Query**|**queryId**  <br>*optional*|The value of the x-ms-continuation-queryId header from the previouse response of this operation, used for reading the next page of data.|string||
+|**Query**|**queryId**  <br>*optional*|The value of the _x-ms-continuation-queryId_ header from the previouse response of this operation, used for reading the next page of data.|string||
 |**Query**|**rowsPerRead**  <br>*optional*|Specifies how many rows of data to retrieve each time.|integer|`10`|
 |**Query**|**sortNodesBy**  <br>*optional*|A node property by which nodes will be sorted. If this parameter is not specified or a property with a specified name does not exist for a node, the result will be sorted by node Id.|string|`"Id"`|
 
@@ -213,7 +212,7 @@ Get the values of the specified properties for all of the nodes in an HPC cluste
 
 |HTTP Code|Description|Schema|
 |---|---|---|
-|**200**|Return a list of nodes.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the queryId query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the queryId URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
+|**200**|Return a list of nodes.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the _queryId_ query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. <br><br>The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the _queryId_ URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
 
 
 #### Example HTTP response
@@ -377,10 +376,10 @@ Gets all/filtered jobs for the HPC cluster.
 |Type|Name|Description|Schema|Default|
 |---|---|---|---|---|
 |**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
-|**Query**|**$filter**  <br>*optional*|Filter jobs by specified filters. A filter is in the form of "{name}20eq%20{value}", and multiple filters can be ANDed like "{filter1}%20and%20{filter2}…". Available filter names are JobState, NodeGroup and ChangeTimeFrom.|string||
+|**Query**|**$filter**  <br>*optional*|Filter jobs by specified filters. A filter is in the form of "<name>20eq%20<value>", and multiple filters can be ANDed like "<filter1>%20and%20<filter2>…". Available filter names are _JobState_, _NodeGroup_ and _ChangeTimeFrom_.|string||
 |**Query**|**owner**  <br>*optional*|The user who created, submitted, or queued the job.|string||
 |**Query**|**properties**  <br>*optional*|A comma-separated list of the names for the properties of the jobs for which you want to get values.|string|`"Id,Owner,Name,State,Priority"`|
-|**Query**|**queryId**  <br>*optional*|The value of the x-ms-continuation-queryId header from the previouse response of this operation, used for reading the next page of data.|string||
+|**Query**|**queryId**  <br>*optional*|The value of the _x-ms-continuation-queryId_ header from the previouse response of this operation, used for reading the next page of data.|string||
 |**Query**|**rowsPerRead**  <br>*optional*|Specifies how many rows of data to retrieve each time.|integer|`10`|
 |**Query**|**sortJobsBy**  <br>*optional*|A job property by which jobs will be sorted. If this parameter is not specified or a property with a specified name does not exist for a job, the result will be sorted by job Id.|string|`"Id"`|
 
@@ -389,7 +388,7 @@ Gets all/filtered jobs for the HPC cluster.
 
 |HTTP Code|Description|Schema|
 |---|---|---|
-|**200**|Return a list of jobs.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the queryId query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the queryId URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
+|**200**|Return a list of jobs.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the _queryId_ query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. <br><br>The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the _queryId_ URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
 
 
 #### Example HTTP response
@@ -472,7 +471,7 @@ Create a new job on the HPC cluster by using the information in the specified jo
 |Type|Name|Description|Schema|
 |---|---|---|---|
 |**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string|
-|**Body**|**xml**  <br>*optional*|Job properties in XML|string|
+|**Body**|**xml**  <br>*optional*|A job described in XML. For an example:<br><br>```xml<br><Job><br>  <Tasks><br>    <Task CommandLine="hostname" MinCores="1" MaxCores="1" /><br>  </Tasks><br></Job><br>```<br><br>Note that since the server accepts input in JSON, the XML has to be encoded in a JSON string.|string|
 
 
 #### Responses
@@ -825,10 +824,10 @@ Get the values of the properties for all of the tasks in the specified job.
 |---|---|---|---|---|
 |**Header**|**x-ms-as-user**  <br>*optional*|The name of user whom you want to make request as. You must be an HPC Pack administrator or HPC Pack Job administrator to make it work.|string||
 |**Path**|**jobId**  <br>*required*|Job Id|integer||
-|**Query**|**$filter**  <br>*optional*|Filter tasks by specified filters. A filter is in the form of "{name}20eq%20{value}", and multiple filters can be ANDed like "{filter1}%20and%20{filter2}…". Available filter names are TaskState, ChangeTimeFrom, TaskStates, TaskIds and TaskInstanceIds.|string||
+|**Query**|**$filter**  <br>*optional*|Filter tasks by specified filters. A filter is in the form of "<name>20eq%20<value>", and multiple filters can be ANDed like "<filter1>%20and%20<filter2>…". Available filter names are _TaskState_, _ChangeTimeFrom_, _TaskStates_, _TaskIds_ and _TaskInstanceIds_.|string||
 |**Query**|**expandParametric**  <br>*optional*|Specifies whether to get properties only for the master task for a parametric sweep task, or for all of the subtasks instead. True indicates that you want to get properties for all of the subtasks. False indicates that you want to get properties only for the master task.|boolean|`"true"`|
 |**Query**|**properties**  <br>*optional*|A comma-separated list of the names for the properties of the tasks for which you want to get values.|string|`"TaskId,Name,State,CommandLine,ExitCode,ParentJobId,JobTaskId,InstanceId"`|
-|**Query**|**queryId**  <br>*optional*|The value of the x-ms-continuation-queryId header from the previouse response of this operation, used for reading the next page of data.|string||
+|**Query**|**queryId**  <br>*optional*|The value of the _x-ms-continuation-queryId_ header from the previouse response of this operation, used for reading the next page of data.|string||
 |**Query**|**rowsPerRead**  <br>*optional*|Specifies how many rows of data to retrieve each time.|integer|`10`|
 |**Query**|**sortTasksBy**  <br>*optional*|A task property by which tasks will be sorted. If this parameter is not specified or a property with a specified name does not exist for a task, the result will be sorted by task Id.|string|`"TaskId"`|
 
@@ -837,7 +836,7 @@ Get the values of the properties for all of the tasks in the specified job.
 
 |HTTP Code|Description|Schema|
 |---|---|---|
-|**200**|Return a list of tasks of the job.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the queryId query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the queryId URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
+|**200**|Return a list of tasks of the job.  <br>**Headers** :   <br>`x-ms-continuation-queryId` (string) : Enables large sets of data to be returned in smaller responses across a continuation sequence of several requests. The value of this header is to be assigned to the _queryId_ query parameter in the next call of the sequence of calls to this API. The response contains this header as long as additional data remains to be processed. <br><br>The format of the data in this header is not guaranteed to remain unchanged. You should only copy the data in this header from one operation in a set of multiple operations to the _queryId_ URI parameter for the next operation. You should not use the data in this header or depend on the format of the data in this header in any other way.|< [RestObject](#restobject) > array|
 
 
 #### Example HTTP response
